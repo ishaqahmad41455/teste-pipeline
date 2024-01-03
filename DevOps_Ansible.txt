@@ -1,0 +1,72 @@
+  ===> DevOps Ansible
+    --> Configuration management tool
+    --> system admin used this
+    --> with the healp of ansible we can automate all processes.
+    --> push base server
+    --> used for app deployment as well
+    --> with the help of ansible the speed of work will be so fast. and the play book which we make will alwayse be there.
+  ===> it has 3 main part
+     1. system admin or ansible system
+     2. host file (the file which have store all the ips of other servers which are connected to system admin.) inside host file we can create a context for doing specific work in
+        specific server. by specifying the name of the server in the cotext.
+     3. playbook (a file with the YAML formet where we will create all the necessory configuration inside it and we call this playbook inside host file or system admin. so it can 
+        make our work easy to configure.
+  ===> Ansible feature
+    --> configuration management
+    --> app deploy
+    --> orchestration
+    --> security and compliance
+    --> cloud provisioning.
+ ===> Ansible architecture
+    --> module
+    --> plugin
+    --> inventries
+    --> playboks
+    --> roles
+    --> APIs
+  ===> other tools (salt, puppet, chef, febric)
+
+ ===> steps to install Ansible:
+    1. sudo apt update
+    2. sudo apt-add-repository ppa:ansible/ansible
+    3. sudo apt install ansible
+    4. cd /etc/ansible/   (by defalt these file will be made all the configuration will go inside this file)
+    5. to mantain connection with other server or machine. for that generate ssh-keys of each machine. go inside cd .ssh/ then type ssh-keygen
+       then sent the public key to othen servers ---> one way go inside the rsb-pub and copy and past to other server authorize_key and save it it will communicate with each other.
+    6. ssh-copy-id -i id_rsa.pub test2@192.168.1.221---- just do this it will add it.
+    7. ssh test2@192.168.1.221 (for checking that is it connect with other servers)
+  ==> now the work starts in ansible: cd /etc/ansible 
+    --> command after estiblishing the connection trough ssh keys. and editing hosts file.
+       1. ansible-inventory --list -y  (to check the inventry)
+       2. ansible allservers -m ping -u test  (to know is it steplishing connection or not its ping command)
+       3. ansible LB<--specific context -m ping -u test (to know one by one ping the servers by specifying the context)
+       4. ansible database -a "df -h"  (to know the storage of the specific server)
+       5. ansible allservers -a "df -h" (to know the storage of all servers)
+       6. ansible allservers -a "uptime"
+
+after this go inside host file by vim---- inside i will write all the code in separate note.
+   --> after saveing the host file by adding somthing then do cross check that the changes are done or not by this command:---> ansible-inventory --list -y
+   --> to check the connection are properly working or not from ansible/ is the host is alive are not.. type this command:---> ansible allservers -m ping -u test5
+       instead of test5 do write the name of server you are using
+
+ ===> To start initial level plybook (for that i write in another notpad name as playbook.yaml) 
+   --> to start playbook.yaml after writing inside it.
+    1. ansible-playbook <name of playbook>
+    2. ansible-playbook loadbalancer.yaml --ask-become-pass -> whenever its fail due to sudo or permission by privous command then type this command)
+    3. systemctl status nginx.service -> to check the status of the service which is install by controle machine to the other machine.
+
+ ==> how to send an application to the server and run it in the server:
+	-> git clone <website github>  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    latest repo tocken
+		i want to send a file to webservers. i have written all the command in playbook
+
+
+
+
+
+
+
+
+     
+
+
+ 
