@@ -1,0 +1,130 @@
+---
+   - hosts: allservers
+     tasks:
+       - command: hostname
+
+-----------------------------------------------------------------------------------------------------
+#to install nginx in loadbalancer server:
+
+---
+   - hosts: LB
+     become: true #for becoming root user otherwise it will give error
+     tasks:
+       - name: installation of nginx latest version
+         apt: name=nginx state=present update_cache=yes
+----------------------------------------------------------------------------------------------------
+#to install mysql in database server:
+---
+  - hosts: database
+    become: true
+    tasks:
+      - name: installation of MYSQL latest version
+        apt: name=mysql-server state=present update_cache=yes
+--------------------------------------------------------------------------------------------------------------------------------
+#to install apache2 and all dapandencies in webservers. 01 and 02
+---
+  - hosts: webservers
+    become: true
+    tasks:
+      - name: Update package lists and upgrade system
+        apt: update_cache=yes upgrade=yes
+      - name: installation of apache2 and all dependcies
+        apt: name={{item}} state=present update_cache=yes
+        with_items:
+          - apache2
+          - libapache2-mod-wsgi
+          - python-pip
+          - python-virtualenv
+          - wget
+          - curl
+-----------------------------------------------------------------------------------------------------------------------------
+advance playbook code
+
+---
+- hosts: webservers
+  become: true
+  tasks:
+    - name: Update package lists and upgrade system
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install Apache2 and dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - apache2
+        - libapache2-mod-wsgi
+        - python-pip
+        - python3-pip  # Use python3-pip for Python 3
+        - python-virtualenv
+        - wget
+        - curl
+
+    # Add a task to handle package dependencies on webserver01
+    - name: Install missing dependencies on webserver01
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - apache2-bin
+        - mime-support
+        - ssl-cert
+      when: "'webserver01' in inventory_hostname"
+    # Add a task to check for libapache2-mod-wsgi availability
+    - name: Check if libapache2-mod-wsgi is available
+      command: "apt-cache policy libapache2-mod-wsgi"
+      register: wsgi_pkg
+      ignore_errors: yes
+
+    # Add a task to install libapache2-mod-wsgi if available
+    - name: Install libapache2-mod-wsgi if available
+      apt:
+        name: libapache2-mod-wsgi
+        state: present
+        update_cache: yes
+      when: "'webserver01' not in inventory_hostname or 'Installed: (none)' not in wsgi_pkg.stdout_lines"
+
+    # Add a task to handle missing packages on webserver01
+    - name: Install missing packages on webserver01
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - libapache2-mod-wsgi
+        - python-pip
+        - python3-pip
+        - python-virtualenv
+      when: "'webserver01' in inventory_hostname"
+=======================================================================================================================================
+#to send a code to other server from host server 
+---
+  - hosts: webservers
+    become: true
+    tasks:
+      - name: installation of apache2 and all dependencies
+        apt: name={{item}} state=present update_cache=yes
+        with_items:
+          - apache2
+          - libapache2-mod-wsgi
+          - python3-pip
+          - python3-virtualenv
+          - wget
+          - curl
+      - name: show me the host name
+        command: hostname
+      - name: make sure nginx service is restarted
+        service: name=apache2 state=started enabled=yes
+      - name: copy Stable frantend from host machine to webserver   <---------
+        copy: src=Stable_frantend/ dest=/var/www/html mode=0755
+        notify: restart apache2
+    handlers:
+      - name: restart apache2
+        service: name=apache2 state=restarted <--------------------------------
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+

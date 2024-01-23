@@ -1,0 +1,79 @@
+formet for host file.
+
+[allservers]
+loadbalancer ansible_host=192.168.1.224
+webserver01 ansible_host=192.168.1.221
+webserver02 ansible_host=192.168.1.222
+database01 ansible_host=192.168.1.223
+
+[LB]
+loadbalancer ansible_host=192.168.1.224
+
+[webservers]
+webserver01 ansible_host=192.168.1.221
+webserver02 ansible_host=192.168.1.222
+
+[database]
+database01 ansible_host=192.168.1.223
+----------------------------------------------------------------------------------------------------
+ ==> second formet:
+[allservers]
+loadbalancer ansible_host=192.168.1.224 ansible_user=test5
+webserver01 ansible_host=192.168.1.221 ansible_user=test2
+webserver02 ansible_host=192.168.1.222 ansible_user=test3
+database01 ansible_host=192.168.1.223 ansible_user=test4
+
+[LB]
+loadbalancer ansible_host=192.168.1.224 ansible_user=test5
+
+[webservers]
+webserver01 ansible_host=192.168.1.221 ansible_user=test2
+webserver02 ansible_host=192.168.1.222 ansible_user=test3
+
+[database]
+database01 ansible_host=192.168.1.223 ansible_user=test4
+
+
+------------------------------------------------------------------------------------------------------
+ ===>ansible enventry file
+{
+  "web_servers": {
+    "hosts": ["webserver01", "webserver02"],
+    "vars": {"ansible_user": "test5"}
+  },
+  "database_servers": {
+    "hosts": ["database01"],
+    "vars": {"ansible_user": "test3"}
+  },
+  "loadbalancer": {
+    "hosts": ["loadbalancer"],
+    "vars": {"ansible_user": "test2"}
+  },
+  "_meta": {
+    "hostvars": {
+      "webserver01": {"ansible_host": "192.168.1.221"},
+      "webserver02": {"ansible_host": "192.168.1.222"},
+      "database01": {"ansible_host": "192.168.1.223"},
+      "loadbalancer": {"ansible_host": "192.168.1.224"}
+    }
+  }
+}
+-------------------------------------------------------------------------------------------------------------------===
+ =====> Updated hodtfile: (test5 is controle machine and test6,7,8 and test 9 are remote servers)
+[allservers]
+loadbalancer ansible_host=192.168.1.232 ansible_user=test7
+webserver01 ansible_host=192.168.1.233 ansible_user=test8
+webserver02 ansible_host=192.168.1.234 ansible_user=test9
+database01 ansible_host=192.168.1.231 ansible_user=test6
+
+[LB]
+loadbalancer ansible_host=192.168.1.232 ansible_user=test7
+
+[webservers]
+webserver01 ansible_host=192.168.1.233 ansible_user=test8
+webserver02 ansible_host=192.168.1.234 ansible_user=test9
+
+[database]
+database01 ansible_host=192.168.1.231 ansible_user=test6
+-------------------------------------------------------------------------------------------------------------------------
+
